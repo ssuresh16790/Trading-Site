@@ -30,7 +30,7 @@ module.exports.addAdmin = async (req, res) => {
     const isEmailexist = await authService.checkUser(email);
     if (!_.isNull(isEmailexist)) {
       const response = await authService.addAdmin(req.body);
-      if (!_.isEmpty(response)) {
+      if (response) {
         return res.send({
           status: true,
           Response: response,
@@ -51,7 +51,6 @@ module.exports.addAdmin = async (req, res) => {
     Message: "Admin insert Failed",
   });
 };
-
 
 //adminLogin
 module.exports.adminLogin = async (req, res) => {
@@ -86,7 +85,6 @@ module.exports.adminLogin = async (req, res) => {
   });
 };
 
-
 //addUser
 module.exports.addUser = async (req, res) => {
   try {
@@ -98,7 +96,6 @@ module.exports.addUser = async (req, res) => {
       mobileNumber: Joi.number().required(),
       password: Joi.string().min(8).required(),
       type: Joi.string().required(),
-      address: Joi.string().length(10).required(),
     });
 
     const { error } = authSchema.validate(req.body);
@@ -112,9 +109,10 @@ module.exports.addUser = async (req, res) => {
 
     var email = req.body.email;
     const isEmailexist = await authService.checkUser(email);
-    if (!_.isEmpty(isEmailexist)) {
+    if (!_.isNull(isEmailexist)) {
       const response = await authService.addUser(req.body);
-      if (!_.isEmpty(response)) {
+
+      if (response) {
         return res.send({
           status: true,
           Response: response,
@@ -128,15 +126,17 @@ module.exports.addUser = async (req, res) => {
         Response: "Already Email Exist",
       });
     }
+
   } catch (error) {
     console.log(error);
   }
+
+
   return res.send({
     status: false,
     Message: "User insert Failed",
   });
 };
-
 
 //userLogin
 module.exports.userLogin = async (req, res) => {
@@ -177,12 +177,11 @@ module.exports.userLogin = async (req, res) => {
   });
 };
 
-
 //adminMail OTP Login
 module.exports.mailotp = async (req, res) => {
   try {
     const mail = await mailService.sendingmail(req.body);
-    if (!_.isNull(mail)) {
+    if (!_.isEmpty(mail)) {
       res.send({
         status: true,
         message: "Mail Sent Successfully",
@@ -199,3 +198,22 @@ module.exports.mailotp = async (req, res) => {
     });
   }
 };
+
+
+module.exports.otpUserlogin = async(req, res) => {
+  try {
+    const response = await authService.otpUserlogin(req.body)
+    if (!_.isEmpty(response)) {
+      res.send({
+        status : true, 
+        Response : response
+      })
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return res.send({
+    status : false,
+    Response : "Enter Valid OTP"
+  })
+}

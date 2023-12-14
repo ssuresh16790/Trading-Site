@@ -10,7 +10,7 @@ const otpGenerator = require('otp-generator');
 //addAdmin
 module.exports.addAdmin = async(props) => {
   try {
-    
+    console.log(props);
 const { firstName, lastName, userName, email, mobileNumber, password } = props
 
     const hashPassword = bcrypt.hashSync(password, 10);
@@ -71,11 +71,6 @@ const { firstName, lastName, userName, email, mobileNumber, password, type, addr
 module.exports.userLogin = async(props) => {
     try {
       const { email, password } = props;
-     
-      const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false })
-
-      console.log(otp);
-
       
       // const response = await db('user').select('email','password', 'type').where('email', email).where({password}).where({type})
       const response = await db('user').select('email', 'password').where('email' , '=', email);
@@ -95,8 +90,6 @@ module.exports.userLogin = async(props) => {
         }
      
       }
-
-        
   
     } catch (error) {
       console.log(error);
@@ -106,8 +99,9 @@ module.exports.userLogin = async(props) => {
 
   module.exports.checkUser = async (email) => {
     try {
-        const response = await db('user').select('email').where('email', '=', email).first();
-        if(!_.isNull(response)) {
+        const response = await db('user').select('email').where('email', '=', email);
+        console.log(response);
+        if(!_.isEmpty(response)) {
             return null;
         } else {
             return true;
@@ -118,3 +112,13 @@ module.exports.userLogin = async(props) => {
     }
 }
 
+
+module.exports.otpUserlogin = async(props) => {
+  try {
+    const { otp } =  props
+    const response = await db('user').select('otp').where('otp', '=', otp)
+    return !_.isEmpty(response) ? response : null
+  } catch (error) {
+    console.log(error);
+  }
+}

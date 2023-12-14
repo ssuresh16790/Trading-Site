@@ -13,7 +13,9 @@ router.post('/userlogin', authController.userLogin)
 
 router.post('/otp', authController.mailotp);
 
-router.post('/addAdmin', authController.addAdmin);
+router.post('/addadmin', authController.addAdmin);
+
+
 
 
 module.exports = router;
