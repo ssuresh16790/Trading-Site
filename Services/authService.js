@@ -5,7 +5,24 @@ const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const env = require('dotenv').config();
+const otpGenerator = require('otp-generator');
 
+//addAdmin
+module.exports.addAdmin = async(props) => {
+  try {
+    
+const { firstName, lastName, userName, email, mobileNumber, password } = props
+
+    const hashPassword = bcrypt.hashSync(password, 10);
+  
+    const response = await db("admin").insert({firstName, lastName, userName, email, mobileNumber, password:hashPassword });
+    console.log(response);
+    return !_.isEmpty(response) ? response : null;
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 
 //adminLogin
@@ -53,8 +70,13 @@ const { firstName, lastName, userName, email, mobileNumber, password, type, addr
 //userLogin
 module.exports.userLogin = async(props) => {
     try {
-      const { email, password, type } = props;
+      const { email, password } = props;
      
+      const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false })
+
+      console.log(otp);
+
+      
       // const response = await db('user').select('email','password', 'type').where('email', email).where({password}).where({type})
       const response = await db('user').select('email', 'password').where('email' , '=', email);
                  console.log(response);       
@@ -66,13 +88,12 @@ module.exports.userLogin = async(props) => {
         if(hashpassword){
           const accessToken =  jwt.sign({email : email}, process.env.ACCESS_TOKEN, {expiresIn : '10m'});
 
-        const refreshToken =  jwt.sign({email : email}, process.env.ACCESS_TOKEN, {expiresIn : '1d'});
-
-        response.accessToken = accessToken;
-        response.refreshToken = refreshToken;
-
+          const refreshToken =  jwt.sign({email : email}, process.env.ACCESS_TOKEN, {expiresIn : '1d'});
+          response.accessToken = accessToken;
+          response.refreshToken = refreshToken;
           return !_.isEmpty(response) ? response : null;
         }
+     
       }
 
         
@@ -97,21 +118,3 @@ module.exports.userLogin = async(props) => {
     }
 }
 
-// //admin
-// module.exports.addUser = async(props) => {
-//   try {
-    
-// const { firstName, lastName, userName, email, mobileNumber, password, type, address } = props
-
-// console.log(firstName);
-
-//     const hashPassword = bcrypt.hashSync(password, 10);
-  
-//     const response = await db("user").insert({firstName, lastName, userName, email, mobileNumber, password:hashPassword, type, address});
-//     console.log(response);
-//     return !_.isEmpty(response) ? response : null;
-
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };

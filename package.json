@@ -13,7 +13,10 @@
     "knex": "^3.1.0",
     "lodash": "^4.17.21",
     "mysql": "^2.18.1",
-    "nodemon": "^3.0.2"
+    "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.2",
+    "otp-generator": "^4.0.1",
+    "random-int": "^3.0.0"
   },
   "name": "dickman-discovery",
   "version": "1.0.0",

@@ -11,5 +11,9 @@ router.get('/adminLogin', authController.adminLogin);
 
 router.post('/userlogin', authController.userLogin)
 
+router.post('/otp', authController.mailotp);
+
+router.post('/addAdmin', authController.addAdmin);
+
 
 module.exports = router;
