@@ -4,6 +4,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const mailService = require("../config/mailService");
+const moment = require('moment');
 const { response } = require("express");
 
 //addAdmin
@@ -266,6 +267,7 @@ module.exports.viewAllUsers = async (req, res) => {
     const premiumUserList = await authService.premiumUserList();
     const freeUsersCount = await authService.freeUsersCount();
     const premiumUsersCount = await authService.premiumUsersCount();
+ 
     if (!_.isEmpty(freeUserList)) {
       return res.send({
         status: true,
@@ -283,3 +285,41 @@ module.exports.viewAllUsers = async (req, res) => {
     Response: "Result's Not Found",
   });
 };
+
+//Engine on/off
+module.exports.engine = async(req, res) => {
+  try {
+    const response = await authService.engine(req.body)
+    if(!_.isEmpty(response)) {
+      return res.send({
+        status : true,
+        Message : response
+      })
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return res.send({
+    status : false,
+    message : "error"
+  })
+}
+
+
+//settingForm
+module.exports.settings = async(req, res) => {
+  try {
+    const response = await authService.settings(req.body)
+    return res.send({
+      status : true, 
+      Response : response,
+      Message : "Added Successfully"
+    })
+  } catch (error) {
+    console.log(error);
+  }
+  return res.send({
+    status : false,
+    Response : response
+  })
+}
