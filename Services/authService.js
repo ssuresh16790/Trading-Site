@@ -15,7 +15,7 @@ const { firstName, lastName, userName, email, mobileNumber, password } = props
 
     const hashPassword = bcrypt.hashSync(password, 10);
   
-    const response = await db("admin").insert({firstName, lastName, userName, email, mobileNumber, password:hashPassword });
+    const response = await db("admin").insert({firstName, lastName, email, mobileNumber, password:hashPassword });
     console.log(response);
     return !_.isEmpty(response) ? response : null;
 
@@ -25,7 +25,7 @@ const { firstName, lastName, userName, email, mobileNumber, password } = props
 };
 
 
-//adminLogin
+//adminLoginOTP
 module.exports.adminLogin = async (props) => {
     try {
       const { email, password } = props;
@@ -97,7 +97,7 @@ module.exports.userLogin = async(props) => {
   };
 
 
-  module.exports.checkUser = async (email) => {
+  module.exports.checkUser = async(email) => {
     try {
         const response = await db('user').select('email').where('email', '=', email);
         console.log(response);
@@ -113,12 +113,78 @@ module.exports.userLogin = async(props) => {
 }
 
 
-module.exports.otpUserlogin = async(props) => {
+
+
+//userOTPSending
+module.exports.updateOtp = async(email, otp) => {
   try {
-    const { otp } =  props
-    const response = await db('user').select('otp').where('otp', '=', otp)
+    const response = await db('user').update({otp:otp}).where('email', email)
+    console.log(response);
     return !_.isEmpty(response) ? response : null
   } catch (error) {
     console.log(error);
   }
+}
+
+
+
+module.exports.otpUserlogin = async(props) => {
+  try {
+    const { email, otp } = props
+    const response = await db('user').select('email', 'otp').where('otp', otp).where('email', email)
+    console.log(response);
+    return !_.isEmpty(response) ? response : null
+  } catch (error) {
+    console.log(error);
+  }
+
+}
+
+
+
+module.exports.adminLogin = async(props) => {
+  try {
+    const { email, password } = props;
+    
+    // const response = await db('user').select('email','password', 'type').where('email', email).where({password}).where({type})
+    const response = await db('admin').select('email', 'password').where('email' , '=', email);
+               console.log(response);       
+    if(!_.isEmpty(response)){
+      const storedPasswordHash = _.get(response, "[0].password", "");
+
+      const hashpassword =  await bcrypt.compare(password, storedPasswordHash);
+      
+      if(hashpassword){
+        return !_.isEmpty(response) ? response : null;
+      }
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+module.exports.updateAdminOtp = async(email, otp) => {
+  try {
+    const response = await db('admin').update({otp:otp}).where('email', email)
+    console.log(response);
+    return !_.isEmpty(response) ? response : null
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
+module.exports.otpAdminlogin = async(props) => {
+  try {
+    const { email, otp } = props
+    const response = await db('admin').select('email', 'otp').where('otp', otp).where('email', email)
+    console.log(response);
+    return !_.isEmpty(response) ? response : null
+  } catch (error) {
+    console.log(error);
+  }
+
 }

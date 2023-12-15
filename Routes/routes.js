@@ -7,13 +7,15 @@ router.get('/', (req, res) => {
 
 router.post('/adduser', authController.addUser);
 
-router.get('/adminLogin', authController.adminLogin);
+router.post('/adminLogin', authController.adminLogin);
 
 router.post('/userlogin', authController.userLogin)
 
-router.post('/otp', authController.mailotp);
+router.post('/otpUserLogin', authController.otpUserlogin)
 
 router.post('/addadmin', authController.addAdmin);
+
+router.post('/otpAdminLogin', authController.otpAdminlogin)
 
 
 

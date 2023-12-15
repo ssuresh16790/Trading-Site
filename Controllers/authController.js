@@ -4,6 +4,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const mailService = require("../config/mailService");
+const { response } = require("express");
 
 //addAdmin
 module.exports.addAdmin = async (req, res) => {
@@ -52,38 +53,7 @@ module.exports.addAdmin = async (req, res) => {
   });
 };
 
-//adminLogin
-module.exports.adminLogin = async (req, res) => {
-  try {
-    const authSchema = Joi.object({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(8).required(),
-    });
 
-    const { error } = authSchema.validate(req.body);
-
-    if (error) {
-      return res.send({
-        status: false,
-        Response: error.message,
-      });
-    }
-    const response = await authService.adminLogin(req.body);
-    console.log(response);
-    if (!_.isEmpty(response)) {
-      return res.send({
-        status: true,
-        Response: "Login Success",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  return res.send({
-    status: false,
-    Response: "Incorrect Email or Password",
-  });
-};
 
 //addUser
 module.exports.addUser = async (req, res) => {
@@ -126,11 +96,9 @@ module.exports.addUser = async (req, res) => {
         Response: "Already Email Exist",
       });
     }
-
   } catch (error) {
     console.log(error);
   }
-
 
   return res.send({
     status: false,
@@ -146,10 +114,56 @@ module.exports.userLogin = async (req, res) => {
       password: Joi.string().min(8).required(),
     });
 
-    const otp = otpGenerator.generate(6, {
-      upperCase: false,
-      specialChars: false,
-      alphabets: false,
+    const { error } = authSchema.validate(req.body);
+    if (error) {
+      return res.send({
+        status: false,
+        Response: error.message,
+      });
+    }
+    const response = await authService.userLogin(req.body);
+    if (!_.isEmpty(response)) {
+      // return res.send({
+      //   status: true,
+      //   Message: "Login Successfully!",
+      //   Response: response,
+      // });
+      var otp = otpGenerator.generate(6, {
+        digits: true,
+        upperCase: false,
+        specialChars: false,
+        alphabets: false,
+      });
+      var email = req.body.email;
+      const sendOtp = await mailService.sendOtpForLogin(email, otp);
+      if (!_.isNull(sendOtp)) {
+        const updateOtp = await authService.updateOtp(email, otp);
+        if (!_.isNull(updateOtp)) {
+            }
+      }
+      return res.send({
+        status : true,
+        Message : "Otp Sent Successfully"
+     })
+    }
+   
+  } catch (error) {
+    console.log(error);
+  }
+  return res.send({
+    status: false,
+    Message: "Something Went Wrong!",
+  });
+};
+
+//adminMail OTP Login
+
+
+module.exports.otpUserlogin = async (req, res) => {
+  try {
+    const authSchema = Joi.object({
+      email: Joi.string().email().required(),
+      otp: Joi.string().min(6).required(),
     });
 
     const { error } = authSchema.validate(req.body);
@@ -159,13 +173,11 @@ module.exports.userLogin = async (req, res) => {
         Response: error.message,
       });
     }
-    const response = await authService.userLogin(req.body);
-    response.otp = otp;
+    const response = await authService.otpUserlogin(req.body);
     if (!_.isEmpty(response)) {
       return res.send({
         status: true,
-        Message: "Login Successfully!",
-        Response: response,
+        Response : "Login Success",
       });
     }
   } catch (error) {
@@ -173,39 +185,103 @@ module.exports.userLogin = async (req, res) => {
   }
   return res.send({
     status: false,
-    Message: "Username or Password Incorrect!",
+    Response: "Enter Valid OTP",
   });
 };
 
-//adminMail OTP Login
-module.exports.mailotp = async (req, res) => {
+
+//adminOtpLogin
+
+//adminLogin
+module.exports.adminLogin = async (req, res) => {
   try {
-    const mail = await mailService.sendingmail(req.body);
-    if (!_.isEmpty(mail)) {
-      res.send({
+    const authSchema = Joi.object({
+      email: Joi.string().email().required(),
+      password: Joi.string().min(8).required(),
+    });
+
+    const { error } = authSchema.validate(req.body);
+    if (error) {
+      return res.send({
+        status: false,
+        Response: error.message,
+      });
+    }
+    const response = await authService.adminLogin(req.body);
+    if (!_.isEmpty(response)) {
+      // return res.send({
+      //   status: true,
+      //   Message: "Login Successfully!",
+      //   Response: response,
+      // });
+      var otp = otpGenerator.generate(6, {
+        digits: true,
+        upperCase: false,
+        specialChars: false,
+        alphabets: false,
+      });
+      var email = req.body.email;
+      const sendOtp = await mailService.sendOtpForLogin(email, otp);
+      if (!_.isNull(sendOtp)) {
+        const updateOtp = await authService.updateAdminOtp(email, otp);
+        if (!_.isNull(updateOtp)) {
+            }
+      }
+      return res.send({
+        status : true,
+        Message : "Otp Sent Successfully"
+     })
+    }
+  
+  } catch (error) {
+    console.log(error);
+  }
+  return res.send({
+    status: false,
+    Message: "Something Went Wrong!",
+  });
+};
+
+//adminOtpverify
+module.exports.otpAdminlogin = async (req, res) => {
+  try {
+    const authSchema = Joi.object({
+      email: Joi.string().email().required(),
+      otp: Joi.string().min(6).required(),
+    });
+
+    const { error } = authSchema.validate(req.body);
+    if (error) {
+      return res.send({
+        status: false,
+        Response: error.message,
+      });
+    }
+
+    const response = await authService.otpAdminlogin(req.body);
+    if (!_.isEmpty(response)) {
+      return res.send({
         status: true,
-        message: "Mail Sent Successfully",
+        Response : "Login Success",
       });
     }
   } catch (error) {
     console.log(error);
-    res.status(200).json({
-      message: "OK",
-    });
-    return res.send({
-      status: false,
-      message: "Mail sent Failed",
-    });
   }
+  return res.send({
+    status: false,
+    Response: "Invalid Credentials",
+  });
 };
 
 
-module.exports.otpUserlogin = async(req, res) => {
+//ViewAllUsers
+module.exports.viewAllUsers = async(req, res) => {
   try {
-    const response = await authService.otpUserlogin(req.body)
-    if (!_.isEmpty(response)) {
-      res.send({
-        status : true, 
+    const response = await authService.viewAllUsers()
+    if(!_.isEmpty(response)) {
+      return res.send({
+        status : true,
         Response : response
       })
     }
@@ -213,7 +289,7 @@ module.exports.otpUserlogin = async(req, res) => {
     console.log(error);
   }
   return res.send({
-    status : false,
-    Response : "Enter Valid OTP"
+    status: false,
+    Response : response
   })
 }
