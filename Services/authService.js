@@ -176,7 +176,7 @@ module.exports.updateAdminOtp = async(email, otp) => {
 }
 
 
-
+//AdminOtpbasedLogin
 module.exports.otpAdminlogin = async(props) => {
   try {
     const { email, otp } = props
@@ -186,5 +186,44 @@ module.exports.otpAdminlogin = async(props) => {
   } catch (error) {
     console.log(error);
   }
+}
 
+
+//viewAllUsers
+module.exports.freeUserList = async(props) => {
+  try {
+    const response = await db('user').select("*").where('type', '=', 'free')
+    return !_.isEmpty(response) ? response  : null
+  } catch (error) {
+    console.log(error);    
+  }
+}
+
+
+module.exports.premiumUserList = async() => {
+  try {
+    const response = await db('user').select('*').where('type', '=', 'premium')
+    return !_.isEmpty(response) ? response  : null
+  } catch (error) {
+    console.log(error);    
+  }
+}
+
+//usersCount
+module.exports.freeUsersCount = async() => {
+  try {
+    const response = await db('user').count('* as count').where('type','free')
+    return response ? response :  null
+  } catch (error) {
+    console.log(error);    
+  }
+}
+
+module.exports.premiumUsersCount = async() => {
+  try {
+    const response = await db('user').count('* as count').where('type','premium')
+    return response ? response :  null
+  } catch (error) {
+    console.log(error);    
+  }
 }

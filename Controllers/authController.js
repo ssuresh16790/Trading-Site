@@ -53,8 +53,6 @@ module.exports.addAdmin = async (req, res) => {
   });
 };
 
-
-
 //addUser
 module.exports.addUser = async (req, res) => {
   try {
@@ -123,11 +121,6 @@ module.exports.userLogin = async (req, res) => {
     }
     const response = await authService.userLogin(req.body);
     if (!_.isEmpty(response)) {
-      // return res.send({
-      //   status: true,
-      //   Message: "Login Successfully!",
-      //   Response: response,
-      // });
       var otp = otpGenerator.generate(6, {
         digits: true,
         upperCase: false,
@@ -139,14 +132,13 @@ module.exports.userLogin = async (req, res) => {
       if (!_.isNull(sendOtp)) {
         const updateOtp = await authService.updateOtp(email, otp);
         if (!_.isNull(updateOtp)) {
-            }
+        }
       }
       return res.send({
-        status : true,
-        Message : "Otp Sent Successfully"
-     })
+        status: true,
+        Message: "Otp Sent Successfully",
+      });
     }
-   
   } catch (error) {
     console.log(error);
   }
@@ -157,7 +149,6 @@ module.exports.userLogin = async (req, res) => {
 };
 
 //adminMail OTP Login
-
 
 module.exports.otpUserlogin = async (req, res) => {
   try {
@@ -177,7 +168,7 @@ module.exports.otpUserlogin = async (req, res) => {
     if (!_.isEmpty(response)) {
       return res.send({
         status: true,
-        Response : "Login Success",
+        Response: "Login Success",
       });
     }
   } catch (error) {
@@ -188,7 +179,6 @@ module.exports.otpUserlogin = async (req, res) => {
     Response: "Enter Valid OTP",
   });
 };
-
 
 //adminOtpLogin
 
@@ -209,11 +199,7 @@ module.exports.adminLogin = async (req, res) => {
     }
     const response = await authService.adminLogin(req.body);
     if (!_.isEmpty(response)) {
-      // return res.send({
-      //   status: true,
-      //   Message: "Login Successfully!",
-      //   Response: response,
-      // });
+   
       var otp = otpGenerator.generate(6, {
         digits: true,
         upperCase: false,
@@ -225,14 +211,13 @@ module.exports.adminLogin = async (req, res) => {
       if (!_.isNull(sendOtp)) {
         const updateOtp = await authService.updateAdminOtp(email, otp);
         if (!_.isNull(updateOtp)) {
-            }
+        }
       }
       return res.send({
-        status : true,
-        Message : "Otp Sent Successfully"
-     })
+        status: true,
+        Message: "Otp Sent Successfully",
+      });
     }
-  
   } catch (error) {
     console.log(error);
   }
@@ -262,7 +247,7 @@ module.exports.otpAdminlogin = async (req, res) => {
     if (!_.isEmpty(response)) {
       return res.send({
         status: true,
-        Response : "Login Success",
+        Response: "Login Success",
       });
     }
   } catch (error) {
@@ -274,22 +259,27 @@ module.exports.otpAdminlogin = async (req, res) => {
   });
 };
 
-
 //ViewAllUsers
-module.exports.viewAllUsers = async(req, res) => {
+module.exports.viewAllUsers = async (req, res) => {
   try {
-    const response = await authService.viewAllUsers()
-    if(!_.isEmpty(response)) {
+    const freeUserList = await authService.freeUserList();
+    const premiumUserList = await authService.premiumUserList();
+    const freeUsersCount = await authService.freeUsersCount();
+    const premiumUsersCount = await authService.premiumUsersCount();
+    if (!_.isEmpty(freeUserList)) {
       return res.send({
-        status : true,
-        Response : response
-      })
+        status: true,
+        FreeUsers_List: freeUserList,
+        PremiumUser_List: premiumUserList,
+        FreeUsers_Count: freeUsersCount,
+        PremiumUsers_Count: premiumUsersCount,
+      });
     }
   } catch (error) {
     console.log(error);
   }
   return res.send({
     status: false,
-    Response : response
-  })
-}
+    Response: "Result's Not Found",
+  });
+};

@@ -15,7 +15,9 @@ router.post('/otpUserLogin', authController.otpUserlogin)
 
 router.post('/addadmin', authController.addAdmin);
 
-router.post('/otpAdminLogin', authController.otpAdminlogin)
+router.post('/otpAdminLogin', authController.otpAdminlogin);
+
+router.get('/viewAllUsers', authController.viewAllUsers);
 
 
 
