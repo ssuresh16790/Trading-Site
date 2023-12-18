@@ -12,7 +12,7 @@ const moment = require("moment");
 module.exports.addAdmin = async (props) => {
   try {
     console.log(props);
-    const { firstName, lastName, userName, email, mobileNumber, password } =
+    const { firstName, lastName, email, mobileNumber, password } =
       props;
 
     const hashPassword = bcrypt.hashSync(password, 10);
@@ -138,19 +138,20 @@ module.exports.checkUser = async (email) => {
 };
 
 //userOTPSending
-module.exports.updateOtp = async (email, otp) => {
+module.exports.updateOtpForUser = async (email, otp) => {
   try {
+    console.log(otp);
     const response = await db("user")
       .update({ otp: otp })
       .where("email", email);
-    console.log(response);
+    console.log('res',response);
     return !_.isEmpty(response) ? response : null;
   } catch (error) {
     console.log(error);
   }
 };
 
-module.exports.otpUserlogin = async (props) => {
+module.exports.userLoginOtpVerification = async (props) => {
   try {
     const { email, otp } = props;
     const response = await db("user")
@@ -187,8 +188,9 @@ module.exports.adminLogin = async (props) => {
   }
 };
 
-module.exports.updateAdminOtp = async (email, otp) => {
+module.exports.updateOtpForAdmin = async (email, otp) => {
   try {
+    console.log(email, otp);
     const response = await db("admin")
       .update({ otp: otp })
       .where("email", email);
@@ -199,8 +201,9 @@ module.exports.updateAdminOtp = async (email, otp) => {
   }
 };
 
+
 //AdminOtpbasedLogin
-module.exports.otpAdminlogin = async (props) => {
+module.exports.adminLoginOtpVerification = async (props) => {
   try {
     const { email, otp } = props;
     const response = await db("admin")
@@ -209,46 +212,6 @@ module.exports.otpAdminlogin = async (props) => {
       .where("email", email);
     console.log(response);
     return !_.isEmpty(response) ? response : null;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//viewAllUsers
-module.exports.freeUserList = async (props) => {
-  try {
-    const response = await db("user").select("*").where("type", "=", "free");
-    return !_.isEmpty(response) ? response : null;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-module.exports.premiumUserList = async () => {
-  try {
-    const response = await db("user").select("*").where("type", "=", "premium");
-    return !_.isEmpty(response) ? response : null;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//usersCount
-module.exports.freeUsersCount = async () => {
-  try {
-    const response = await db("user").count("* as count").where("type", "free");
-    return response ? response : null;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-module.exports.premiumUsersCount = async () => {
-  try {
-    const response = await db("user")
-      .count("* as count")
-      .where("type", "premium");
-    return response ? response : null;
   } catch (error) {
     console.log(error);
   }
@@ -314,3 +277,5 @@ console.log(response);
     console.log(error);
   }
 };
+
+
