@@ -39,4 +39,6 @@ router.post("/settings", authController.settings);
 
 router.post('/fyersApi', authController.fyersApi);
 
+router.post('/forgotPassword')
+
 module.exports = router;

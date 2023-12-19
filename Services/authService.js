@@ -279,3 +279,13 @@ console.log(response);
 };
 
 
+//forgot Password
+module.exports.forgotPassword = async(props) => {
+  try {
+    const { email, otp } = props
+    const response = await db('user').insert({email:email, otp:otp})
+    !_.isEmpty(response) ? response : null;
+  } catch (error) {
+    console.log(error);
+  }
+}

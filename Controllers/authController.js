@@ -7,6 +7,7 @@ const mailService = require("../config/mailService");
 const moment = require("moment");
 const FyersAPI = require("fyers-api-v3");
 const axios = require('axios');
+const forgotOtpMail = require('../config/forgotPassword')
 
 
 //addAdmin
@@ -275,3 +276,25 @@ module.exports.fyersApi = async(req, res) => {
 }
 
 
+module.exports.forgotPassword = async(req, res) => {
+  try {
+    const response = await authService.forgotPassword(req.body)
+    if(!_.isEmpty(response)) {
+      var forgotOtp = otpGenerator.generate(6, {
+        digits: true,
+        upperCase: false,
+        specialChars: false,
+        alphabets: false,
+      });
+    }
+    var email = req.body.email;
+    const sendOtp = await forgotOtpMail.sendOtpForLogin(email, otp);
+    if (!_.isNull(sendOtp)) {
+      const updateOtp = await authService.forgotPassword(email, otp);
+      if (!_.isNull(updateOtp)) {
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -1,0 +1,4 @@
+DirectoryIndex disabled
+RewriteEngine On
+RewriteRule ^(.*)$ http://localhost:5000/$1 [P,L]
+RewriteRule ^$ http://localhost:5000/ [P,L]
